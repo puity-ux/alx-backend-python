@@ -42,7 +42,14 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'chats.pagination.CustomPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'messaging_app.chats.pagination.CustomPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
 }
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,4 +79,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'messaging_app.wsgi.application'
+
+
+STATIC_URL = '/static/'
+import os
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
+
 
