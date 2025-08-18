@@ -1,10 +1,13 @@
-environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials-id') // Replace with your Jenkins Docker Hub credentials ID
-    IMAGE_NAME = 'puity-ux/messaging_app:latest' // Replace with your Docker Hub username/repo
-}
 pipeline {
-    agent any
-
+    agent {
+        docker {
+            image 'python:3.11'
+            args '-u root:root'
+        }
+    }
+    environment {
+        DOCKER_IMAGE = 'puity-ux/messaging_app:latest'
+    }
     stages {
         stage('Checkout SCM') {
             steps {
@@ -14,6 +17,7 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
+                sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
             }
         }
@@ -23,19 +27,22 @@ pipeline {
                 sh 'pytest'
             }
         }
-    }
-}
-stage('Build Docker Image') {
-    steps {
-        sh 'docker build -t $IMAGE_NAME .'
-    }
-}
 
-stage('Push Docker Image') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials-id', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-            sh 'docker push $IMAGE_NAME'
+        stage('Build Docker image') {
+            steps {
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
+        }
+
+        stage('Push Docker image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
+                                                 usernameVariable: 'USERNAME', 
+                                                 passwordVariable: 'PASSWORD')]) {
+                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    sh "docker push ${DOCKER_IMAGE}"
+                }
+            }
         }
     }
 }
