@@ -2,28 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/puity-ux/alx-backend-python.git',
-                    credentialsId: 'github-credentials'
+                checkout scm
             }
         }
 
         stage('Install dependencies') {
             steps {
-                sh 'pip install -r messaging_app/requirements.txt'
+                sh 'pip install -r requirements.txt'
             }
         }
 
         stage('Run tests') {
             steps {
-                sh 'pytest --maxfail=1 --disable-warnings -q --junitxml=test-results.xml'
-            }
-            post {
-                always {
-                    junit 'test-results.xml'
-                }
+                sh 'pytest'
             }
         }
     }
