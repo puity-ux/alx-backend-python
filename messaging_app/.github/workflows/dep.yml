@@ -23,7 +23,3 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t yourdockerhubusername/messaging_app:latest .
-
-      - name: Push Docker image
-        run: |
-          docker push yourdockerhubusername/messaging_app:latest
