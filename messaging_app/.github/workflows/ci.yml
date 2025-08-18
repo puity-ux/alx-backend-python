@@ -34,10 +34,15 @@ jobs:
           python-version: 3.11
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage
+        run: pip install -r requirements.txt mysqlclient
+
+      - name: Run Django tests
+        env:
+          MYSQL_HOST: localhost
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+          MYSQL_DB: test_db
+        run: python manage.py test
 
       - name: Lint with flake8
         run: |
@@ -46,9 +51,9 @@ jobs:
 
       - name: Run tests with coverage
         run: |
+          pip install coverage
           coverage run manage.py test
           coverage xml
-          coverage report
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
